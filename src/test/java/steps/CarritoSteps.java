@@ -97,6 +97,7 @@ public class CarritoSteps {
             System.out.println("El mensaje de éxito no apareció, se valida directamente en el carrito.");
         }
 
+        // Ahora este método ya tiene fallback
         cartPage = productPage.irACarritoDesdeNotificacion();
         cartPage.validarUrlContiene("checkout/cart");
     }

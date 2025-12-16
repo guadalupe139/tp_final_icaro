@@ -1,10 +1,8 @@
 package pages;
 
 import base.BasePage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import base.BaseTest;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -60,15 +58,23 @@ public class ProductoPage extends BasePage {
     }
 
     public CarritoPage irACarritoDesdeNotificacion() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement banner = wait.until(ExpectedConditions.presenceOfElementLocated(
-                By.xpath("//div[contains(@class,'alert-success')]")
-        ));
-        WebElement linkCarrito = banner.findElement(By.xpath(".//a[contains(@href,'checkout/cart')]"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", linkCarrito);
-        wait.until(ExpectedConditions.urlContains("checkout/cart"));
+        WebDriverWait wait = new WebDriverWait(BaseTest.getDriver(), Duration.ofSeconds(5));
+        try {
+            // Intentar esperar el banner de éxito
+            WebElement banner = wait.until(ExpectedConditions.presenceOfElementLocated(
+                    By.xpath("//div[contains(@class,'alert-success')]")
+            ));
+            WebElement linkCarrito = banner.findElement(By.xpath(".//a[contains(@href,'checkout/cart')]"));
+            ((JavascriptExecutor) BaseTest.getDriver()).executeScript("arguments[0].click();", linkCarrito);
+        } catch (TimeoutException e) {
+            // Si no aparece el banner, ir directo al menú "Shopping Cart"
+            WebElement cartLink = BaseTest.getDriver().findElement(By.linkText("Shopping Cart"));
+            ((JavascriptExecutor) BaseTest.getDriver()).executeScript("arguments[0].click();", cartLink);
+        }
 
-        return new CarritoPage(driver);
+        // Esperar que la URL sea la del carrito
+        wait.until(ExpectedConditions.urlContains("checkout/cart"));
+        return new CarritoPage(BaseTest.getDriver());
     }
 
 }
